@@ -19,8 +19,12 @@
 
 //QString digitalautoDeployFile = "/opt/Kit-Agency/deploy/prototypes.json";
 //QString digitalautoDeployFolder = "/opt/Kit-Agency/deploy/";
-QString digitalautoDeployFolder = "/usr/bin/dreamkit/prototypes/";
+QString DK_ROOT_DIR             = "/usr/bin/dreamkit/";
+QString digitalautoDeployFolder = DK_ROOT_DIR + "prototypes/";
 QString digitalautoDeployFile   = digitalautoDeployFolder + "prototypes.json";
+QString DK_DREAMKIT_UNIQUE_SERIAL_NUMBER_FILE = DK_ROOT_DIR + "serial-number";
+QString DK_BOARD_UNIQUE_SERIAL_NUMBER_FILE    = "/proc/device-tree/serial-number";
+
 
 QMutex digitalAutoPrototypeMutex;
 
@@ -97,10 +101,9 @@ DigitalAutoAppAsync::DigitalAutoAppAsync()
     m_timer->stop();
     m_deploymentProgressPercent = 0;
 
-    std::string DK_BOARD_UNIQUE_SERIAL_NUMBER_FILE = "/proc/device-tree/serial-number";
     QString serialNo = "dreamKIT-";
-    if(digitalAutoFileExists(DK_BOARD_UNIQUE_SERIAL_NUMBER_FILE)) {
-        QFile serialNoFile(QString::fromStdString(DK_BOARD_UNIQUE_SERIAL_NUMBER_FILE));
+    if(digitalAutoFileExists(DK_BOARD_UNIQUE_SERIAL_NUMBER_FILE.toStdString())) {
+        QFile serialNoFile(DK_BOARD_UNIQUE_SERIAL_NUMBER_FILE);
         if (!serialNoFile.open(QIODevice::ReadOnly)) {
             qDebug() << __func__ << __LINE__ << serialNoFile.errorString();
         }
@@ -109,6 +112,17 @@ DigitalAutoAppAsync::DigitalAutoAppAsync()
             serialNo += outputStream.readAll();
             serialNoFile.close();
         }
+    }
+    else if(digitalAutoFileExists(DK_DREAMKIT_UNIQUE_SERIAL_NUMBER_FILE.toStdString())) {
+    	QFile serialNoFile(DK_DREAMKIT_UNIQUE_SERIAL_NUMBER_FILE);
+    	if (!serialNoFile.open(QIODevice::ReadOnly)) {
+    		qDebug() << __func__ << __LINE__ << serialNoFile.errorString();
+    	}
+    	else {
+    		QTextStream outputStream (&serialNoFile);
+    		serialNo += outputStream.readAll();
+    		serialNoFile.close();
+    	}
     }
     else {
         serialNo += "defaultName";
