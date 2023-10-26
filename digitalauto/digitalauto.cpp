@@ -280,9 +280,20 @@ Q_INVOKABLE void DigitalAutoAppAsync::executeApp(const QString name, const QStri
         }
 
         // start digital.auto app
+        QString homepath = "/home/jetson";
+        if (const char* env_p = std::getenv("HOME_PATH")) {
+        	homepath.clear();
+        	homepath = QString::fromLocal8Bit(env_p);
+        	qDebug()  << "Your PATH is: " << homepath << '\n';
+        }
+
+
         QString cmd;
         cmd += "cd " + digitalautoDeployFolder + appId + ";> main.log;";
-        cmd += "dapr run --app-id " + appId + " --app-protocol grpc --resources-path /home/retrofit/.dapr/components --config /home/retrofit/.dapr/config.yaml --app-port 50008 ";
+        cmd += "dapr run --app-id " + appId + " --app-protocol grpc --resources-path ";
+        cmd += homepath + "/.dapr/components --config ";
+        cmd += homepath + "/.dapr/config.yaml --app-port 50008 ";
+//        cmd += "dapr run --app-id " + appId + " --app-protocol grpc --resources-path /home/jetson/.dapr/components --config /home/jetson/.dapr/config.yaml --app-port 50008 ";
 //        cmd += "python3 " + digitalautoDeployFolder + appId + "/main.py  &";
         cmd += "python3 main.py  > main.log 2>&1 &";
         qDebug() << cmd;
