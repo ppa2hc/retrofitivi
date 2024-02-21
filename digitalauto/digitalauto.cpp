@@ -101,7 +101,16 @@ DigitalAutoAppAsync::DigitalAutoAppAsync()
     m_timer->stop();
     m_deploymentProgressPercent = 0;
 
-    QString serialNo = "dreamKIT-";
+    // QString serialNo = "dreamKIT-";
+
+    QString prefix = "";
+    prefix = qgetenv("DKCODE");
+    if(prefix.isEmpty()) {
+        prefix = "Target-Runtime";
+    }
+
+    QString serialNo = "";
+
     if(digitalAutoFileExists(DK_BOARD_UNIQUE_SERIAL_NUMBER_FILE.toStdString())) {
         QFile serialNoFile(DK_BOARD_UNIQUE_SERIAL_NUMBER_FILE);
         if (!serialNoFile.open(QIODevice::ReadOnly)) {
@@ -125,11 +134,18 @@ DigitalAutoAppAsync::DigitalAutoAppAsync()
     	}
     }
     else {
-        serialNo += "defaultName";
+        serialNo += "xxxxxxxxxxxxxxx";
     }
+
+
     serialNo.remove(QChar::Null);
-    qDebug() << __func__ << __LINE__ << "serialNo: " << serialNo;
-    m_serialNo = serialNo;
+    serialNo.replace("\n", "");
+    if((serialNo.length()>8)) {
+        serialNo = serialNo.right(8);
+    }
+    m_serialNo = prefix + "-" + serialNo;
+
+    qDebug() << __func__ << __LINE__ << "serialNo: " << m_serialNo;
 }
 
 void DigitalAutoAppAsync::updateDeploymentProgress()
