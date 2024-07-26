@@ -14,12 +14,60 @@ Rectangle {
         anchors.fill: parent
     }
 
+    property int iconSize: 100
+    property int iconSpacing: 350
+
+    // First logo
+    Image {
+        id: bgswlogo
+        y: 10
+        x: 10
+        source: "resource/bgswlogo.png"
+        width: 110
+        height: 110
+        fillMode: Image.PreserveAspectFit
+    }
+    // Second logo
+    Image {
+        id: digitalautologo
+        y: -30
+        x: iconSpacing
+        //source: "resource/digitalautologo.jpeg" 
+        source: "resource/logo2.png" 
+        width: 200
+        height: 200
+        fillMode: Image.PreserveAspectFit
+    }
+    // Third logo
+    Image {
+        id: etaslogo
+        y: -30
+        x: iconSpacing*2
+        //source: "resource/etaslogo.jpg" 
+        source: "resource/logo3.png" 
+        width: 200
+        height: 200
+        fillMode: Image.PreserveAspectFit
+    }
+    // Fourth logo
+    Image {
+        id: boschlogo
+        y: -30
+        x: iconSpacing*3
+        //source: "resource/boschlogo.png"
+        source: "resource/logo4.png" 
+        width: 200
+        height: 200
+        fillMode: Image.PreserveAspectFit
+    }
+
+
     Image {
         id: pendulum
-        source: "resource/bot.png"  // Replace with your image path
+        source: "resource/bot.png"
         width: 700*2/3
         height: 825*2/3
-        //anchors.horizontalCenter: parent.horizontalCenter
+        anchors.horizontalCenter: parent.horizontalCenter
         anchors.verticalCenter: parent.verticalCenter
         transformOrigin: Item.Center
         // Pendulum swing animation
@@ -43,30 +91,35 @@ Rectangle {
     Rectangle {
         id: textContainer
         width: parent.width * 0.6
-        height: 200
-        x: 450
-        //anchors.horizontalCenter: parent.horizontalCenter
-        anchors.verticalCenter: parent.verticalCenter
+        height: 50
+        //x: 450
+        y: pendulum.y + pendulum.height
+        anchors.horizontalCenter: parent.horizontalCenter
+        //anchors.verticalCenter: parent.verticalCenter
         //anchors.bottom: parent.bottom
         //anchors.bottomMargin: 20
         radius: 10
-        color: "#333"
-        border.color: "#777"
-        border.width: 2
-        opacity: 0.8
+        color: "transparent"
+        //color: "#333"
+        //border.color: "#777"
+        //border.width: 2
+        //opacity: 0.8
 
-        TextInput {
+        Text {
             id: text2speechField
             width: parent.width - 20
             height: parent.height
             anchors.centerIn: parent
             font.pixelSize: 30
             font.bold: true
-            text: textDisplay // Initial text, replace with your text
+            text: textDisplay
             color: "white"
             wrapMode: TextEdit.Wrap 
             verticalAlignment: Text.AlignVCenter
             horizontalAlignment: Text.AlignHCenter
+            //lineHeight: 6
+            lineHeight: 1.1
+            lineHeightMode: Text.ProportionalHeight
         }
     }
 
@@ -79,12 +132,17 @@ Rectangle {
                 textDisplay += fullText.charAt(currentIndex)
                 currentIndex++
             } else {
-                typingTimer.stop()
+                currentIndex++
+                if (currentIndex > (fullText.length + 50)) {
+                    typingTimer.stop()
+                    //textDisplay = ""
+                    currentIndex = 0
+                }                
             }
         }
     }
 
-    property string fullText: "Hi Stefan. Welcome to your digital automotive space. A custom coffee is being prepared. Fasten seat belt, relax, and enjoy your exceptional journey!"
+    property string fullText: "Hi Stefan. Welcome to your digital automotive space."
     property string textDisplay: ""
     property int currentIndex: 0
 

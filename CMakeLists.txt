@@ -26,6 +26,17 @@ qt_add_qml_module(retrofitivi
         resource/trashbin2.png
         resource/editicon3.png
         resource/bot.png
+        resource/bgswlogo.png
+        resource/digitalautologo.png
+        resource/digitalautologo.jpeg
+        resource/etaslogo.jpeg
+        resource/etaslogo.jpg
+        resource/boschlogo.jpeg
+        resource/boschlogo.png
+        resource/logo1.png
+        resource/logo2.png
+        resource/logo3.png
+        resource/logo4.png
 )
 
 set_target_properties(retrofitivi PROPERTIES
