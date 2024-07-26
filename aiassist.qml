@@ -41,7 +41,7 @@ Rectangle {
     Image {
         id: bgswlogo
         y: 10
-        x: 10
+        x: 20
         source: "resource/bgswlogo.png"
         width: 110
         height: 110
@@ -111,7 +111,7 @@ Rectangle {
                 anchors.fill: parent
                 onClicked: {
                     //console.log("Logo 1 clicked")
-                    aiassistAsync.setTextToSpeech("Hello Stefan. Welcome to your digital automotive space. Your custom coffee is being prepared. Fasten seat belt, relax, and enjoy your exceptional journey")
+                    //aiassistAsync.setTextToSpeech("Hello Stefan. Welcome to your digital automotive space. Your custom coffee is being prepared. Fasten seat belt, relax, and enjoy your exceptional journey")
                 }
             }
     }

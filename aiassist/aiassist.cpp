@@ -39,7 +39,7 @@ void initPyEnv()
     // Load the script
     pName = PyUnicode_DecodeFSDefault("vssclient");
     pModule = PyImport_Import(pName);
-    pFunc = PyObject_GetAttrString(pModule, "getVssTargetValue");
+    pFunc = PyObject_GetAttrString(pModule, "getCurrentValue");
 }
 
 VssThread::VssThread(AiassistAsync *parent)
@@ -48,7 +48,8 @@ VssThread::VssThread(AiassistAsync *parent)
 }
 
 void VssThread::run()
-{
+{    
+    QString oldTimeStamp;
     QString oldText;
 
     initPyEnv();
@@ -56,21 +57,24 @@ void VssThread::run()
     while(1) {
         //qDebug() << "VssThread::run";
         QString value;
+        QString currentTimeStamp;
 
-        value = getVssApiValue("Vehicle.TextToSpeech");
+        value = getVssApiValue("Vehicle.TextToSpeech", currentTimeStamp);
+        // qDebug() << oldTimeStamp <<  " -------- " << currentTimeStamp;
 
         if (value != "nullstring") {
-            if (oldText != value) {
+            if (currentTimeStamp != oldTimeStamp) {
                 m_parent->setTextToSpeech(value);
+                oldTimeStamp = currentTimeStamp;
                 oldText = value;
             }            
         }
 
-        QThread::msleep(100);
+        QThread::msleep(1000);
     }
 }
 
-QString VssThread::getVssApiValue(QString apiName)
+QString VssThread::getVssApiValue(QString apiName, QString &currentTimeStamp)
 {
     if (pModule != nullptr) {
 
@@ -81,26 +85,47 @@ QString VssThread::getVssApiValue(QString apiName)
             PyObject *pArgs = PyTuple_Pack(1, PyUnicode_FromString(apiName.toStdString().c_str()));
 
             // Call the function
-            PyObject *pValue = PyObject_CallObject(pFunc, pArgs);
-            
+            PyObject *pValue = PyObject_CallObject(pFunc, pArgs);            
             Py_DECREF(pArgs);
+            // Check if the result is a tuple
+            if (PyTuple_Check(pValue)) {
+                PyObject *pVal = PyTuple_GetItem(pValue, 0);
+                PyObject *pTime = PyTuple_GetItem(pValue, 1);
+                // qDebug() << "PyTuple_Check True";
 
-            if (pValue != nullptr) {
-                // Convert the result to a C++ string
-                const char* resultCStr = PyUnicode_AsUTF8(pValue);
-                if (resultCStr != nullptr) {
-                    std::string result = resultCStr;
-                    Py_DECREF(pValue);
-                    return QString::fromStdString(result);
-                } else {
-                    Py_DECREF(pValue);
-                    PyErr_Print();
-                    std::cerr << "Error: PyUnicode_AsUTF8 returned null" << std::endl;
-                }
-            } else {
-                PyErr_Print();
-                std::cerr << "Call to get_tts_text failed" << std::endl;
+                if (pVal && pTime) {
+                    const char *resultCStr = PyUnicode_AsUTF8(pVal);
+                    const char *timestampCStr = PyUnicode_AsUTF8(pTime);
+
+                    if (resultCStr && timestampCStr) {
+                        std::string result = resultCStr;
+                        std::string timestamp = timestampCStr;
+                        currentTimeStamp = QString::fromStdString(timestamp);
+                        Py_DECREF(pValue);
+                        // return std::make_tuple(QString::fromStdString(result), QString::fromStdString(timestamp));
+                        return QString::fromStdString(result);
+                    }
+                 }
             }
+            else {
+                // qDebug() << "PyTuple_Check False";
+                if (pValue != nullptr) {
+                    // Convert the result to a C++ string
+                    const char* resultCStr = PyUnicode_AsUTF8(pValue);
+                    if (resultCStr != nullptr) {
+                        std::string result = resultCStr;
+                        Py_DECREF(pValue);
+                        return QString::fromStdString(result);
+                    } else {
+                        Py_DECREF(pValue);
+                        PyErr_Print();
+                        std::cerr << "Error: PyUnicode_AsUTF8 returned null" << std::endl;
+                    }
+                } else {
+                    PyErr_Print();
+                    std::cerr << "Call to get_tts_text failed" << std::endl;
+                }
+            }            
         } else {
             if (PyErr_Occurred()) PyErr_Print();
             std::cerr << "Cannot find function 'get_tts_text'" << std::endl;

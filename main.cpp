@@ -2,8 +2,6 @@
 #include <QQmlApplicationEngine>
 #include "digitalauto/digitalauto.hpp"
 #include "aiassist/aiassist.hpp"
-#include <iostream>
-#include <string>
 
 int main(int argc, char *argv[])
 {

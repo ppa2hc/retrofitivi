@@ -21,7 +21,7 @@ public:
 private:
     AiassistAsync *m_parent;
 
-    QString getVssApiValue(QString apiName);
+    QString getVssApiValue(QString apiName, QString &currentTimeStamp);
 
 };
 
