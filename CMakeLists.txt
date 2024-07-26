@@ -18,10 +18,14 @@ qt_add_executable(retrofitivi
 qt_add_qml_module(retrofitivi
     URI untitled2
     VERSION 1.0
-    QML_FILES Main.qml
+    QML_FILES 
+        Main.qml
+        digitalauto.qml
+        aiassist.qml
     RESOURCES
         resource/trashbin2.png
         resource/editicon3.png
+        resource/bot.png
 )
 
 set_target_properties(retrofitivi PROPERTIES
