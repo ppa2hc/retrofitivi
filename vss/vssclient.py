@@ -9,7 +9,7 @@ def getCurrentValue(vapi):
             # print(current_values[vapi].value)
             return current_values[vapi].value
         else:
-            return "No value found"  # Ensure a string is always returned
+            return "nullstring"  # Ensure a string is always returned
 
 def getVssCurrentValue(vapi):
     return getCurrentValue(vapi)
@@ -21,10 +21,13 @@ def getTargetValue(vapi):
             # print(current_values[vapi].value)
             return current_values[vapi].value
         else:
-            return "No value found"  # Ensure a string is always returned
+            return "nullstring"  # Ensure a string is always returned
 
 def getVssTargetValue(vapi):
     return getTargetValue(vapi)
+
+# def getVssTargetValue():
+#     return getTargetValue("Vehicle.TextToSpeech")
 
 # getVssCurrentValue("Vehicle.TextToSpeech")
 # getVssTargetValue("Vehicle.TextToSpeech")

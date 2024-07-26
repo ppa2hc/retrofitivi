@@ -76,8 +76,15 @@ QString VssThread::getVssApiValue(QString apiName)
 
         // Check if the function is callable
         if (PyCallable_Check(pFunc)) {
+
+            // Prepare the arguments for the function call
+            PyObject *pArgs = PyTuple_Pack(1, PyUnicode_FromString(apiName.toStdString().c_str()));
+
             // Call the function
-            PyObject *pValue = PyObject_CallObject(pFunc, nullptr);
+            PyObject *pValue = PyObject_CallObject(pFunc, pArgs);
+            
+            Py_DECREF(pArgs);
+
             if (pValue != nullptr) {
                 // Convert the result to a C++ string
                 const char* resultCStr = PyUnicode_AsUTF8(pValue);
