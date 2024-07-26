@@ -2,6 +2,12 @@ cmake_minimum_required(VERSION 3.16)
 
 project(untitled2 VERSION 0.1 LANGUAGES CXX)
 
+# Find Python3
+find_package(Python3 COMPONENTS Interpreter Development REQUIRED)
+
+# Include directories
+include_directories(${Python3_INCLUDE_DIRS})
+
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
@@ -13,6 +19,7 @@ find_package(Qt6 6.2 REQUIRED COMPONENTS Quick)
 qt_add_executable(retrofitivi
     main.cpp 
     digitalauto/digitalauto.cpp
+    aiassist/aiassist.cpp
 )
 
 qt_add_qml_module(retrofitivi
@@ -49,7 +56,10 @@ set_target_properties(retrofitivi PROPERTIES
 
 target_link_libraries(retrofitivi
     PRIVATE Qt6::Quick
+    ${Python3_LIBRARIES}
 )
+
+# target_link_libraries(main ${Python3_LIBRARIES})
 
 install(TARGETS retrofitivi
     BUNDLE DESTINATION .

@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Window
+import AiassistAsync 1.0
 
 Rectangle {
     color: "red"
@@ -12,6 +13,25 @@ Rectangle {
         id: bg
         color: "#212121"
         anchors.fill: parent
+    }
+
+    //property string fullText: "Hi Stefan. Welcome to your digital automotive space."
+    property string fullText: ""
+    property string textDisplay: ""
+    property int currentIndex: 0
+
+    //Component.onCompleted: {
+    //    typingTimer.start()
+    //}
+
+    AiassistAsync {
+        id: aiassistAsync
+
+        onUpdateTextToSpeech: (msg)=> {
+            console.log("tts: ", msg)
+            fullText = msg
+            typingTimer.start()
+        }
     }
 
     property int iconSize: 100
@@ -86,6 +106,14 @@ Rectangle {
                 easing.type: Easing.InOutQuad
             }
         }
+
+        MouseArea {
+                anchors.fill: parent
+                onClicked: {
+                    //console.log("Logo 1 clicked")
+                    aiassistAsync.setTextToSpeech("Hello Stefan. Welcome to your digital automotive space. Your custom coffee is being prepared. Fasten seat belt, relax, and enjoy your exceptional journey")
+                }
+            }
     }
 
     Rectangle {
@@ -135,18 +163,11 @@ Rectangle {
                 currentIndex++
                 if (currentIndex > (fullText.length + 50)) {
                     typingTimer.stop()
-                    //textDisplay = ""
+                    textDisplay = ""
                     currentIndex = 0
                 }                
             }
         }
     }
 
-    property string fullText: "Hi Stefan. Welcome to your digital automotive space."
-    property string textDisplay: ""
-    property int currentIndex: 0
-
-    Component.onCompleted: {
-        typingTimer.start()
-    }
 }
