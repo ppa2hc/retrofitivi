@@ -37,4 +37,3 @@ build/*
 !./build/dk-manager
 .cproject
 .project
-digitalauto.qml
