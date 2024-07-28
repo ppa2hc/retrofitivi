@@ -56,7 +56,7 @@ void DigitalAutoAppCheckThread::run()
 {
     while(1) {
         if (m_istriggeredAppStart && !m_appId.isEmpty() && !m_appName.isEmpty()) {
-            QThread::msleep(6000); // workaround: wait 2s for the app to start. TODO: consider to check if the start time is more than 2s
+            QThread::msleep(3000); // workaround: wait 2s for the app to start. TODO: consider to check if the start time is more than 2s
             system("dapr list > /usr/bin/dreamkit/prototypes/listcmd.log");
             QThread::msleep(10);
             QFile MyFile("/usr/bin/dreamkit/prototypes/listcmd.log");

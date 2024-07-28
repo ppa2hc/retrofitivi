@@ -10,10 +10,12 @@ def getCurrentValue(vapi):
             # print(current_values[vapi].value)
             timestamp = current_values[vapi].timestamp 
             # print(current_values[vapi].value)
-            print(f"Value: {value}, Timestamp: {timestamp}")
+            # print(f"Value: {value}, Timestamp: {timestamp}")
             return value, str(timestamp)
         else:
             return "nullstring"  # Ensure a string is always returned
+    if client is None:
+        return "nullstring"
 
 def getVssCurrentValue(vapi):
     return getCurrentValue(vapi)
@@ -26,6 +28,8 @@ def getTargetValue(vapi):
             return value
         else:
             return "nullstring"  # Ensure a string is always returned
+    if client is None:
+        return "nullstring"
 
 def getVssTargetValue(vapi):
     return getTargetValue(vapi)

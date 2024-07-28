@@ -4,6 +4,7 @@ import QtQuick.Layouts
 import QtQuick.Window
 
 ApplicationWindow {
+    id: mainWindow
     visible: true
     width: Screen.width
     height: Screen.height

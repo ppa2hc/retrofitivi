@@ -2,6 +2,7 @@
 #include <QQmlApplicationEngine>
 #include "digitalauto/digitalauto.hpp"
 #include "aiassist/aiassist.hpp"
+#include <QQmlContext>
 
 int main(int argc, char *argv[])
 {
@@ -18,6 +19,10 @@ int main(int argc, char *argv[])
                 QCoreApplication::exit(-1);
         }, Qt::QueuedConnection);
     engine.load(url);
+
+     // Get the root object (main window) and set it as a context property
+    QObject *rootObject = engine.rootObjects().first();
+    engine.rootContext()->setContextProperty("mainWindow", rootObject);
 
     int ret = app.exec();
 

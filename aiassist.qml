@@ -28,8 +28,12 @@ Rectangle {
         id: aiassistAsync
 
         onUpdateTextToSpeech: (msg)=> {
-            console.log("tts: ", msg)
+            //console.log("tts: ", msg)
+            textDisplay = ""
+            fullText = ""
             fullText = msg
+            currentIndex = 0
+            typingTimer.stop()
             typingTimer.start()
         }
     }
@@ -110,6 +114,7 @@ Rectangle {
         MouseArea {
                 anchors.fill: parent
                 onClicked: {
+                    mainWindow.visibility = Window.FullScreen
                     //console.log("Logo 1 clicked")
                     //aiassistAsync.setTextToSpeech("Hello Stefan. Welcome to your digital automotive space. Your custom coffee is being prepared. Fasten seat belt, relax, and enjoy your exceptional journey")
                 }
@@ -121,7 +126,7 @@ Rectangle {
         width: parent.width * 0.6
         height: 50
         //x: 450
-        y: pendulum.y + pendulum.height
+        y: pendulum.y + pendulum.height + 10
         anchors.horizontalCenter: parent.horizontalCenter
         //anchors.verticalCenter: parent.verticalCenter
         //anchors.bottom: parent.bottom
@@ -161,7 +166,7 @@ Rectangle {
                 currentIndex++
             } else {
                 currentIndex++
-                if (currentIndex > (fullText.length + 50)) {
+                if (currentIndex > (fullText.length + 20)) {
                     typingTimer.stop()
                     textDisplay = ""
                     currentIndex = 0

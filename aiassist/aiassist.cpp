@@ -1,7 +1,16 @@
+#define USING_VSS
+
+#ifdef USING_VSS
 #pragma push_macro("slots")
 #undef slots
 #include <Python.h>
 #pragma pop_macro("slots")
+// Python global object
+PyObject *pFunc;
+PyObject *pName;
+PyObject *pModule;
+bool isPyEnvOk = false;
+#endif
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -22,13 +31,11 @@
 #include <iostream>
 #include <string>
 
-// Python global object
-PyObject *pFunc;
-PyObject *pName;
-PyObject *pModule;
+
 
 void initPyEnv()
 {
+#ifdef USING_VSS
     // Initialize the Python Interpreter
     Py_Initialize();
 
@@ -38,8 +45,32 @@ void initPyEnv()
 
     // Load the script
     pName = PyUnicode_DecodeFSDefault("vssclient");
+    if(!pName) {
+        isPyEnvOk = false;
+        return;
+    }
+
     pModule = PyImport_Import(pName);
+    if(!pModule) {
+        isPyEnvOk = false;
+        return;
+    }
+
     pFunc = PyObject_GetAttrString(pModule, "getCurrentValue");
+    if(!pFunc) {
+        isPyEnvOk = false;
+        return;
+    }
+    
+    isPyEnvOk= true;
+#endif
+}
+
+void endPyEnv()
+{
+#ifdef USING_VSS
+    Py_Finalize();
+#endif
 }
 
 VssThread::VssThread(AiassistAsync *parent)
@@ -53,6 +84,16 @@ void VssThread::run()
     QString oldText;
 
     initPyEnv();
+
+    #ifdef USING_VSS
+    if(!isPyEnvOk) {
+        qDebug() << "Python Environment Setup is failed. This IVI shall not get access to VSS data.\n \
+        Below could be the issues:\n \
+        1. Python dev lib is missing.\n \
+        2. Missing vssclient.py. Let's copy from retrofitivi/vss/vssclient.py to build folder.";
+        return;
+    }
+    #endif
     
     while(1) {
         //qDebug() << "VssThread::run";
@@ -76,6 +117,7 @@ void VssThread::run()
 
 QString VssThread::getVssApiValue(QString apiName, QString &currentTimeStamp)
 {
+#ifdef USING_VSS
     if (pModule != nullptr) {
 
         // Check if the function is callable
@@ -134,7 +176,7 @@ QString VssThread::getVssApiValue(QString apiName, QString &currentTimeStamp)
         PyErr_Print();
         std::cerr << "Failed to load 'vssclient'" << std::endl;
     } 
-
+#endif
     return "nullstring";
 }
 
@@ -148,7 +190,7 @@ AiassistAsync::~AiassistAsync()
 {
     if(vssThread)
         delete vssThread;
-    Py_Finalize();
+    endPyEnv();
 }
 
 void AiassistAsync::setTextToSpeech(QString msg)
