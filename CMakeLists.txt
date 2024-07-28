@@ -44,6 +44,9 @@ qt_add_qml_module(retrofitivi
         resource/logo2.png
         resource/logo3.png
         resource/logo4.png
+        resource/sec_car_attack.webp
+        resource/sec_car_safe.webp
+        resource/sec_security_processing.gif
 )
 
 set_target_properties(retrofitivi PROPERTIES

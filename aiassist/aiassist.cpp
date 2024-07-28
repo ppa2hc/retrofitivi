@@ -81,7 +81,8 @@ VssThread::VssThread(AiassistAsync *parent)
 void VssThread::run()
 {    
     QString oldTimeStamp;
-    QString oldText;
+    QString oldTtsText;
+    bool oldIsAttackedSts = false;
 
     initPyEnv();
 
@@ -97,25 +98,169 @@ void VssThread::run()
     
     while(1) {
         //qDebug() << "VssThread::run";
-        QString value;
-        QString currentTimeStamp;
+        QString ttsText;
+        QString currentTimeStamp="";
 
-        value = getVssApiValue("Vehicle.TextToSpeech", currentTimeStamp);
-        // qDebug() << oldTimeStamp <<  " -------- " << currentTimeStamp;
-
-        if (value != "nullstring") {
+        ttsText = getString_VssApiValue("Vehicle.TextToSpeech", currentTimeStamp);
+        if (ttsText != "nullstring") {
             if (currentTimeStamp != oldTimeStamp) {
-                m_parent->setTextToSpeech(value);
+                m_parent->setTextToSpeech(ttsText);
                 oldTimeStamp = currentTimeStamp;
-                oldText = value;
+                oldTtsText = ttsText;
             }            
+        }
+
+        
+        // for security
+        // check is attacked
+        currentTimeStamp="";
+        bool isAttacked = getBool_VssApiValue("Vehicle.Security.isAttacked", currentTimeStamp);
+        if (currentTimeStamp == "") {
+            qDebug() << "Vehicle.Security.isAttacked is not set";
+        }
+        else {
+            if (isAttacked != oldIsAttackedSts) {
+                // only show the widget when isAttacked gets changed.
+                m_parent->setSecurityIsAttacked(isAttacked);
+            }
+            oldIsAttackedSts = isAttacked;
+        }
+
+        if (isAttacked) {
+            // check security reaction stage
+            currentTimeStamp="";
+            u_int32_t secReact = getUint32_VssApiValue("Vehicle.Security.IDPS.VehicleReaction", currentTimeStamp);
+            if (currentTimeStamp == "") {
+                qDebug() << "Vehicle.Security.IDPS.VehicleReaction is not set";
+            }
+            else {
+                m_parent->setSecurityReactionStage(secReact);
+            }
         }
 
         QThread::msleep(1000);
     }
 }
 
-QString VssThread::getVssApiValue(QString apiName, QString &currentTimeStamp)
+bool VssThread::getBool_VssApiValue(QString apiName, QString &currentTimeStamp)
+{
+#ifdef USING_VSS
+    if (pModule != nullptr) {
+
+        // Check if the function is callable
+        if (PyCallable_Check(pFunc)) {
+
+            // Prepare the arguments for the function call
+            PyObject *pArgs = PyTuple_Pack(1, PyUnicode_FromString(apiName.toStdString().c_str()));
+
+            // Call the function
+            PyObject *pValue = PyObject_CallObject(pFunc, pArgs);            
+            Py_DECREF(pArgs);
+            // Check if the result is a tuple
+            if (PyTuple_Check(pValue)) {
+                PyObject *pVal = PyTuple_GetItem(pValue, 0);
+                PyObject *pTime = PyTuple_GetItem(pValue, 1);
+                // qDebug() << "PyTuple_Check True";
+
+                if (pVal && pTime) {
+                    bool result = PyObject_IsTrue(pVal);
+                    const char *timestampCStr = PyUnicode_AsUTF8(pTime);
+
+                    if (timestampCStr) {
+                        std::string timestamp = timestampCStr;
+                        currentTimeStamp = QString::fromStdString(timestamp);
+                        Py_DECREF(pValue);
+                        // return std::make_tuple(QString::fromStdString(result), QString::fromStdString(timestamp));
+                        return result;
+                    }
+                 }
+            }
+            else {
+                // qDebug() << "PyTuple_Check False";
+                if (pValue != nullptr) {
+                    if (currentTimeStamp == "") 
+                        return false;
+                    // Convert the result to a C++ string
+                    bool result = PyObject_IsTrue(pValue);
+                    Py_DECREF(pValue);
+                    return result;
+                } else {
+                    PyErr_Print();
+                    std::cerr << "Call to get_tts_text failed" << std::endl;
+                }
+            }            
+        } else {
+            if (PyErr_Occurred()) PyErr_Print();
+            std::cerr << "Cannot find function 'get_tts_text'" << std::endl;
+        }        
+    } else {
+        PyErr_Print();
+        std::cerr << "Failed to load 'vssclient'" << std::endl;
+    } 
+#endif
+    return false;
+}
+
+u_int32_t VssThread::getUint32_VssApiValue(QString apiName, QString &currentTimeStamp)
+{
+#ifdef USING_VSS
+    if (pModule != nullptr) {
+
+        // Check if the function is callable
+        if (PyCallable_Check(pFunc)) {
+
+            // Prepare the arguments for the function call
+            PyObject *pArgs = PyTuple_Pack(1, PyUnicode_FromString(apiName.toStdString().c_str()));
+
+            // Call the function
+            PyObject *pValue = PyObject_CallObject(pFunc, pArgs);            
+            Py_DECREF(pArgs);
+            // Check if the result is a tuple
+            if (PyTuple_Check(pValue)) {
+                PyObject *pVal = PyTuple_GetItem(pValue, 0);
+                PyObject *pTime = PyTuple_GetItem(pValue, 1);
+                // qDebug() << "PyTuple_Check True";
+
+                if (pVal && pTime) {
+                    u_int32_t result = PyLong_AsUnsignedLong(pVal);
+                    const char *timestampCStr = PyUnicode_AsUTF8(pTime);
+
+                    if (timestampCStr) {
+                        std::string timestamp = timestampCStr;
+                        currentTimeStamp = QString::fromStdString(timestamp);
+                        Py_DECREF(pValue);
+                        // return std::make_tuple(QString::fromStdString(result), QString::fromStdString(timestamp));
+                        return result;
+                    }
+                 }
+            }
+            else {
+                // qDebug() << "PyTuple_Check False";
+                if (pValue != nullptr) {
+                    if (currentTimeStamp == "") 
+                        return false;
+                    // Convert the result to a C++ string
+                    u_int32_t result = PyLong_AsUnsignedLong(pValue);
+                    Py_DECREF(pValue);
+                    return result;
+                } else {
+                    PyErr_Print();
+                    std::cerr << "Call to get_tts_text failed" << std::endl;
+                }
+            }            
+        } else {
+            if (PyErr_Occurred()) PyErr_Print();
+            std::cerr << "Cannot find function 'get_tts_text'" << std::endl;
+        }        
+    } else {
+        PyErr_Print();
+        std::cerr << "Failed to load 'vssclient'" << std::endl;
+    } 
+#endif
+    return 0;
+}
+
+QString VssThread::getString_VssApiValue(QString apiName, QString &currentTimeStamp)
 {
 #ifdef USING_VSS
     if (pModule != nullptr) {

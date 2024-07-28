@@ -36,6 +36,37 @@ Rectangle {
             typingTimer.stop()
             typingTimer.start()
         }
+
+        onSetSecurityIsAttacked: (sts) => {
+            if (sts == true) {
+                sec_car_attack.visible = true
+                sec_security_processing.visible = false
+                sec_car_safe.visible = false;
+            } else {
+                sec_car_attack.visible = false
+                sec_security_processing.visible = false
+                sec_car_safe.visible = false;
+            }
+
+        }
+
+        onSetSecurityReactionStage: (secReact) => {
+            if (secReact == 1) {
+                // sec_security_processing
+                sec_car_attack.visible = false
+                sec_security_processing.visible = true
+                sec_car_safe.visible = false;
+            }
+            if (secReact == 2) {
+                // sec_car_safe
+                sec_car_attack.visible = false
+                sec_security_processing.visible = false
+                sec_car_safe.visible = true;
+            }
+            if (secReact == 3) {                
+
+            }
+        }
     }
 
     property int iconSize: 100
@@ -85,6 +116,36 @@ Rectangle {
         fillMode: Image.PreserveAspectFit
     }
 
+    property int secImgSize: 400
+    Image {
+        id: sec_car_attack
+        width: secImgSize
+        height: secImgSize
+        source: "resource/sec_car_attack.webp"
+        anchors.verticalCenter: parent.verticalCenter        
+        fillMode: Image.PreserveAspectFit
+        visible: false
+    }
+
+    AnimatedImage {
+        id: sec_security_processing
+        width: secImgSize
+        height: secImgSize
+        source: "resource/sec_security_processing.gif"
+        anchors.verticalCenter: parent.verticalCenter
+        fillMode: Image.PreserveAspectFit
+        visible: false
+    }
+
+    Image {
+        id: sec_car_safe
+        width: secImgSize
+        height: secImgSize
+        source: "resource/sec_car_safe.webp"
+        anchors.verticalCenter: parent.verticalCenter
+        fillMode: Image.PreserveAspectFit
+        visible: false
+    }
 
     Image {
         id: pendulum

@@ -21,7 +21,9 @@ public:
 private:
     AiassistAsync *m_parent;
 
-    QString getVssApiValue(QString apiName, QString &currentTimeStamp);
+    QString getString_VssApiValue(QString apiName, QString &currentTimeStamp);
+    bool getBool_VssApiValue(QString apiName, QString &currentTimeStamp);
+    u_int32_t getUint32_VssApiValue(QString apiName, QString &currentTimeStamp);
 
 };
 
@@ -36,6 +38,9 @@ public:
 
 signals:
     void updateTextToSpeech(QString msg);
+    void setSecurityIsAttacked(bool sts);
+    void setSecurityReactionStage(int secReact);
+
 
 private:
     VssThread *vssThread;

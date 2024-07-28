@@ -4,6 +4,7 @@ DIGITAL_AUTO_IP = '127.0.0.1'
 
 def getCurrentValue(vapi):
     with VSSClient(DIGITAL_AUTO_IP, 55555) as client:
+        # print("getCurrentValue ----     ")
         current_values = client.get_current_values([vapi])
         if current_values[vapi] is not None:
             value = current_values[vapi].value
@@ -13,6 +14,7 @@ def getCurrentValue(vapi):
             # print(f"Value: {value}, Timestamp: {timestamp}")
             return value, str(timestamp)
         else:
+            # print("getCurrentValue is None")
             return "nullstring"  # Ensure a string is always returned
     if client is None:
         return "nullstring"
