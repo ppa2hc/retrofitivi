@@ -60,6 +60,7 @@ public:
 signals:
     void appendAppInfoToAppList(QString name, QString appId, bool isSubscribed);
     void updateStartAppMsg(QString appId, bool isStarted, QString msg);
+    void updateAppRunningSts(QString appId, bool isStarted, int idx);
     void clearAppListView();
     void updateProgressValue(int percent);
     void setProgressVisibility(bool visible);

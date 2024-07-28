@@ -55,6 +55,7 @@ Rectangle {
                 // sec_security_processing
                 sec_car_attack.visible = false
                 sec_security_processing.visible = true
+                sec_security_processing.playing = true
                 sec_car_safe.visible = false;
             }
             if (secReact == 2) {
@@ -111,7 +112,7 @@ Rectangle {
         x: iconSpacing*3
         //source: "resource/boschlogo.png"
         source: "resource/logo4.png" 
-        width: 200
+        width: 200  
         height: 200
         fillMode: Image.PreserveAspectFit
     }
