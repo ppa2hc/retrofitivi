@@ -38,8 +38,6 @@ DigitalAutoAppCheckThread::DigitalAutoAppCheckThread(DigitalAutoAppAsync *parent
 
         if (QFile::exists(path)) {
             m_filewatcher->addPath(path);
-
-//            connect(m_filewatcher, &QFileSystemWatcher::fileChanged, m_digitalAutoAppAsync, &DigitalAutoAppAsync::fileChanged);
             connect(m_filewatcher, SIGNAL(fileChanged(QString)), m_digitalAutoAppAsync, SLOT(fileChanged(QString)));
         }
     }
@@ -101,6 +99,10 @@ DigitalAutoAppAsync::DigitalAutoAppAsync()
     m_timer->stop();
     m_deploymentProgressPercent = 0;
 
+    m_timer_apprunningcheck = new QTimer(this);
+    connect(m_timer_apprunningcheck, SIGNAL(timeout()), this, SLOT(checkRunningAppSts()));
+    m_timer_apprunningcheck->start(5000);
+
     // QString serialNo = "dreamKIT-";
 
     QString prefix = "";
@@ -146,6 +148,39 @@ DigitalAutoAppAsync::DigitalAutoAppAsync()
     m_serialNo = prefix + "-" + serialNo;
 
     qDebug() << __func__ << __LINE__ << "serialNo: " << m_serialNo;
+}
+
+void DigitalAutoAppAsync::checkRunningAppSts()
+{    
+    // qDebug() << __func__;
+    system("> /usr/bin/dreamkit/prototypes/checkRunningAppSts.log;dapr list > /usr/bin/dreamkit/prototypes/checkRunningAppSts.log");
+
+    QFile logFile("/usr/bin/dreamkit/prototypes/checkRunningAppSts.log");
+    if (!logFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        qCritical() << "Failed to open log file: checkRunningAppSts.log";
+        return QString();
+    }
+
+    QTextStream in(&logFile);
+    QString content = in.readAll();
+
+    if (content.isEmpty()) {
+        qCritical() << "Log file is empty or could not be read.";
+        return;
+    }
+
+    int len = m_appListInfo.size();
+    for (int i = 0; i < len; i++) {
+        if (!m_appListInfo[i].appId.isEmpty()) {
+            if (content.contains(m_appListInfo[i].appId)) {
+                // qDebug() << "App ID" << m_appListInfo[i].appId << "is running.";
+                updateAppRunningSts(m_appListInfo[i].appId, true, i);
+            } else {
+                // qDebug() << "App ID" << m_appListInfo[i].appId << "is not running.";
+                updateAppRunningSts(m_appListInfo[i].appId, false, i);
+            }
+        }        
+    }
 }
 
 void DigitalAutoAppAsync::updateDeploymentProgress()
@@ -233,7 +268,6 @@ Q_INVOKABLE void DigitalAutoAppAsync::openAppEditor(int idx)
         return;
     }
 
-    QString;
     m_appListInfo[idx].appId;
 
 

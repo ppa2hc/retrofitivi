@@ -70,12 +70,13 @@ public slots:
     void handleResults(QString appId, bool isStarted, QString msg);
     void fileChanged(const QString& path);
     void updateDeploymentProgress();
-
+    void checkRunningAppSts();
 
 private:
     QList<DigitalAutoAppListStruct> m_appListInfo;
     DigitalAutoAppCheckThread *workerThread;
     QTimer *m_timer;
+    QTimer *m_timer_apprunningcheck;
     int m_deploymentProgressPercent = 0;
     QString m_serialNo;
 };

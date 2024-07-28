@@ -100,7 +100,6 @@ Rectangle {
                                          else {
                                              chkItemChildren[i].checked = false
                                          }
-                                         console.log("found object: ", appIdString)
                                      }
                                  }
                              }
