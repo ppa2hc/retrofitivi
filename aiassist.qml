@@ -39,30 +39,31 @@ Rectangle {
 
         onSetSecurityIsAttacked: (sts) => {
             if (sts == true) {
-                sec_car_attack.visible = true
-                sec_security_processing.visible = false
-                sec_car_safe.visible = false;
+                sec_rect.visible = true
+                sec_targetColor = "red"
+                sec_colorAnimation.running = true
             } else {
-                sec_car_attack.visible = false
-                sec_security_processing.visible = false
-                sec_car_safe.visible = false;
+                sec_rect.visible = false                
+                sec_colorAnimation.running = false
             }
-
         }
 
         onSetSecurityReactionStage: (secReact) => {
+            if (secReact == 0) {                
+                sec_targetColor = "red"
+                sec_colorAnimation.running = true
+            }
             if (secReact == 1) {
                 // sec_security_processing
-                sec_car_attack.visible = false
-                sec_security_processing.visible = true
-                sec_security_processing.playing = true
-                sec_car_safe.visible = false;
+                sec_rect.visible = true
+                sec_targetColor = "blue"
+                sec_colorAnimation.running = true
             }
             if (secReact == 2) {
                 // sec_car_safe
-                sec_car_attack.visible = false
-                sec_security_processing.visible = false
-                sec_car_safe.visible = true;
+                sec_rect.visible = true
+                sec_rect.color = "green"
+                sec_colorAnimation.running = false
             }
             if (secReact == 3) {                
 
@@ -71,34 +72,33 @@ Rectangle {
     }
 
     property int iconSize: 100
-    property int iconSpacing: 350
+    property int iconSpacing: 300
 
     // First logo
     Image {
         id: bgswlogo
-        y: 10
-        x: 20
+        y: 20
+        x: 40
         source: "resource/bgswlogo.png"
-        width: 110
-        height: 110
+        width: 80
+        height: 80
         fillMode: Image.PreserveAspectFit
     }
     // Second logo
     Image {
         id: digitalautologo
-        y: -30
-        x: iconSpacing
-        //source: "resource/digitalautologo.jpeg" 
+        y: 0
+        x: bgswlogo.x + iconSpacing - 20
         source: "resource/logo2.png" 
-        width: 200
-        height: 200
+        width: 130
+        height: 130
         fillMode: Image.PreserveAspectFit
     }
     // Third logo
     Image {
         id: etaslogo
-        y: -30
-        x: iconSpacing*2
+        y: -35
+        x: digitalautologo.x + iconSpacing
         //source: "resource/etaslogo.jpg" 
         source: "resource/logo3.png" 
         width: 200
@@ -108,44 +108,41 @@ Rectangle {
     // Fourth logo
     Image {
         id: boschlogo
-        y: -30
-        x: iconSpacing*3
+        y: -85
+        x: etaslogo.x + iconSpacing
         //source: "resource/boschlogo.png"
         source: "resource/logo4.png" 
-        width: 200  
-        height: 200
+        width: 300  
+        height: 300
         fillMode: Image.PreserveAspectFit
     }
 
-    property int secImgSize: 400
-    Image {
-        id: sec_car_attack
-        width: secImgSize
-        height: secImgSize
-        source: "resource/sec_car_attack.webp"
-        anchors.verticalCenter: parent.verticalCenter        
-        fillMode: Image.PreserveAspectFit
+    property string sec_defaultColor: "#212121"
+    property string sec_targetColor: "red"
+    Rectangle {
+        id: sec_rect
+        width: parent.width
+        height: parent.height
+        color: "blue"
+        opacity: 0.5
         visible: false
-    }
 
-    AnimatedImage {
-        id: sec_security_processing
-        width: secImgSize
-        height: secImgSize
-        source: "resource/sec_security_processing.gif"
-        anchors.verticalCenter: parent.verticalCenter
-        fillMode: Image.PreserveAspectFit
-        visible: false
-    }
-
-    Image {
-        id: sec_car_safe
-        width: secImgSize
-        height: secImgSize
-        source: "resource/sec_car_safe.webp"
-        anchors.verticalCenter: parent.verticalCenter
-        fillMode: Image.PreserveAspectFit
-        visible: false
+        // Define the color animation
+        SequentialAnimation on color {
+            id: sec_colorAnimation
+            loops: Animation.Infinite // Loop the animation infinitely
+            running: false // Start with the animation stopped
+            ColorAnimation {
+                from: sec_defaultColor
+                to: sec_targetColor
+                duration: 1000 // 1 second
+            }
+            ColorAnimation {
+                from: sec_targetColor
+                to: sec_defaultColor
+                duration: 1000 // 1 second
+            }
+        }
     }
 
     Image {
@@ -236,5 +233,4 @@ Rectangle {
             }
         }
     }
-
 }

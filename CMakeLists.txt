@@ -34,19 +34,16 @@ qt_add_qml_module(retrofitivi
         resource/editicon3.png
         resource/bot.png
         resource/bgswlogo.png
-        resource/digitalautologo.png
-        resource/digitalautologo.jpeg
-        resource/etaslogo.jpeg
-        resource/etaslogo.jpg
-        resource/boschlogo.jpeg
-        resource/boschlogo.png
-        resource/logo1.png
+        #resource/digitalautologo.png
+        #resource/etaslogo.jpg
+        #resource/boschlogo.png
+        #resource/logo1.png
         resource/logo2.png
         resource/logo3.png
         resource/logo4.png
-        resource/sec_car_attack.webp
-        resource/sec_car_safe.webp
-        resource/sec_security_processing.gif
+        #resource/sec_security_processing.gif
+        #resource/sec_car_is_secure.png
+        #resource/sec_car_under_attack_.png
 )
 
 set_target_properties(retrofitivi PROPERTIES

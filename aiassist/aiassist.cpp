@@ -109,7 +109,6 @@ void VssThread::run()
                 oldTtsText = ttsText;
             }            
         }
-
         
         // for security
         // check is attacked
@@ -138,7 +137,7 @@ void VssThread::run()
             }
         }
 
-        QThread::msleep(1000);
+        QThread::msleep(300);
     }
 }
 
