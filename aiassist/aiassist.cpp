@@ -157,6 +157,7 @@ bool VssThread::getBool_VssApiValue(QString apiName, QString &currentTimeStamp)
             PyObject *pValue = PyObject_CallObject(pFunc, pArgs);            
             Py_DECREF(pArgs);
             // Check if the result is a tuple
+            if (!pValue) return false;
             if (PyTuple_Check(pValue)) {
                 PyObject *pVal = PyTuple_GetItem(pValue, 0);
                 PyObject *pTime = PyTuple_GetItem(pValue, 1);
@@ -216,6 +217,7 @@ u_int32_t VssThread::getUint32_VssApiValue(QString apiName, QString &currentTime
             PyObject *pValue = PyObject_CallObject(pFunc, pArgs);            
             Py_DECREF(pArgs);
             // Check if the result is a tuple
+            if (!pValue) return 0;
             if (PyTuple_Check(pValue)) {
                 PyObject *pVal = PyTuple_GetItem(pValue, 0);
                 PyObject *pTime = PyTuple_GetItem(pValue, 1);
@@ -275,6 +277,7 @@ QString VssThread::getString_VssApiValue(QString apiName, QString &currentTimeSt
             PyObject *pValue = PyObject_CallObject(pFunc, pArgs);            
             Py_DECREF(pArgs);
             // Check if the result is a tuple
+            if (!pValue) return "nullstring";
             if (PyTuple_Check(pValue)) {
                 PyObject *pVal = PyTuple_GetItem(pValue, 0);
                 PyObject *pTime = PyTuple_GetItem(pValue, 1);

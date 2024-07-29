@@ -67,9 +67,12 @@ u_int32_t getUint32_VssApiValue(std::string apiName, std::string &currentTimeSta
             PyObject *pArgs = PyTuple_Pack(1, PyUnicode_FromString(apiName.c_str()));
 
             // Call the function
-            PyObject *pValue = PyObject_CallObject(pFunc, pArgs);            
+            std::cout << "before: " << std::endl;
+            PyObject *pValue = PyObject_CallObject(pFunc, pArgs); 
+            std::cout << "after _ 1: " << std::endl;
             Py_DECREF(pArgs);
             // Check if the result is a tuple
+            if (!pValue) return 0;
             if (PyTuple_Check(pValue)) {
                 std::cout << "PyTuple_Check True" << std::endl;
                 PyObject *pVal = PyTuple_GetItem(pValue, 0);
