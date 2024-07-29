@@ -83,6 +83,7 @@ void VssThread::run()
     QString oldTimeStamp;
     QString oldTtsText;
     bool oldIsAttackedSts = false;
+    int oldVehicleReact = 0;
 
     initPyEnv();
 
@@ -120,18 +121,16 @@ void VssThread::run()
         else {
             if (isAttacked != oldIsAttackedSts) {
                 // only show the widget when isAttacked gets changed.
-                m_parent->setSecurityIsAttacked(isAttacked);
-
-                // play the sound
-                QString cmd = "";
+                // play the sound                
                 if(isAttacked) {
+                    QString cmd = "";
                     cmd += "dapr run --app-id sec_car_under_attack_alarm -- mpg123 --gain 10 -l 0 /usr/bin/dreamkit/retrofitivi/resource/sec_under_attack.mp3 &";
+                    system(cmd.toUtf8());
                 }
                 else {
                     system("dapr stop sec_car_under_attack_alarm");
-                    cmd += "mpg123 --gain 30 /usr/bin/dreamkit/retrofitivi/resource/sec_car_is_secure.mp3 &";
                 }
-                system(cmd.toUtf8());
+                m_parent->setSecurityIsAttacked(isAttacked);
             }
             oldIsAttackedSts = isAttacked;
         }
@@ -144,6 +143,15 @@ void VssThread::run()
                 qDebug() << "Vehicle.Security.IDPS.VehicleReaction is not set";
             }
             else {
+                if (oldVehicleReact != secReact) {
+                    if (secReact == 2) {
+                        system("dapr stop sec_car_under_attack_alarm");
+                        QString cmd = "";                    
+                        cmd += "mpg123 --gain 30 /usr/bin/dreamkit/retrofitivi/resource/sec_car_is_secure.mp3 &";
+                        system(cmd.toUtf8());
+                    }
+                    oldVehicleReact = secReact;
+                }                
                 m_parent->setSecurityReactionStage(secReact);
             }
         }
