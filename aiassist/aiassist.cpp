@@ -121,6 +121,17 @@ void VssThread::run()
             if (isAttacked != oldIsAttackedSts) {
                 // only show the widget when isAttacked gets changed.
                 m_parent->setSecurityIsAttacked(isAttacked);
+
+                // play the sound
+                QString cmd = "";
+                if(isAttacked) {
+                    cmd += "dapr run --app-id sec_car_under_attack_alarm -- mpg123 --gain 10 -l 0 /usr/bin/dreamkit/retrofitivi/resource/sec_under_attack.mp3 &";
+                }
+                else {
+                    system("dapr stop sec_car_under_attack_alarm");
+                    cmd += "mpg123 --gain 30 /usr/bin/dreamkit/retrofitivi/resource/sec_car_is_secure.mp3 &";
+                }
+                system(cmd.toUtf8());
             }
             oldIsAttackedSts = isAttacked;
         }
